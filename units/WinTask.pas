@@ -251,6 +251,9 @@ type
     FActions : TWinTaskActions;
     FSelectedAction : integer;
     FTriggers: TWinTaskTriggers;
+    function TimeStringToSeconds (TimeString : string) : cardinal;
+    function SecondsToTimeString (Seconds : cardinal) : string;
+
     function GetAuthor : string;
     procedure SetAuthor (Value : string);
     function GetData : string;
@@ -291,6 +294,12 @@ type
     procedure SetPriority (Value : TThreadPriority);
     function GetWakeToRun : boolean;
     procedure SetWakeToRun (Value : boolean);
+    function GetAllowDemandStart : boolean;
+    procedure SetAllowDemandStart (const Value: boolean);
+    function GetAllowHardTerminate : boolean;
+    procedure SetAllowHardTerminate (const Value: boolean);
+    function GetExecutionTimeLimit : cardinal;  // time in seconds
+    procedure SetExecutionTimeLimit (Value : cardinal);
     function GetAction (Index: Integer) : TWinTaskAction;
     function GetActionCount : Integer;
     function GetTrigger (Index: Integer) : TWinTaskTrigger;
@@ -331,6 +340,9 @@ type
     property TriggerCount : integer read GetTriggerCount;
     property UserId : string read GetUserId write SetUserId;
     property WakeToRun : boolean read GetWakeToRun  write SetWakeToRun;
+    property AllowDemandStart : boolean read GetAllowDemandStart write SetAllowDemandStart;
+    property AllowAllowHardTerminate : boolean read GetAllowHardTerminate write SetAllowHardTerminate;
+    property ExecutionTimeLimit : cardinal read GetExecutionTimeLimit write SetExecutionTimeLimit;
     end;
 
   TWinRegisteredTask = class (TObject)
@@ -1372,6 +1384,44 @@ begin
   inherited Destroy;
   end;
 
+function TWinTask.TimeStringToSeconds (TimeString : string) : cardinal;
+var
+  n : word;
+begin
+  Result:=0;
+  if AnsiStartsText('P',TimeString) then begin
+    Delete(TimeString,1,1);
+    if AnsiStartsText('T',TimeString) then begin  // time
+      repeat
+        n:=ReadNextValue(TimeString);
+        if AnsiStartsText('H',TimeString) then Result:=Result+SecsPerHour*n;
+        if AnsiStartsText('M',TimeString) then Result:=Result+SecsPerMin*n;
+        if AnsiStartsText('S',TimeString) then Result:=Result+n;
+        if length(TimeString)>0 then delete(TimeString,1,1);
+        until length(TimeString)=0;
+      end
+    else begin // days
+      n:=ReadNextValue(TimeString);
+      if AnsiStartsText('D',TimeString) then Result:=Result+SecsPerDay*n;
+      end;
+    end
+  end;
+
+function TWinTask.SecondsToTimeString (Seconds : cardinal) : string;
+var
+  h,m,s : word;
+begin
+  if Seconds=0 then Result:=''
+  else if Seconds>=SecsPerDay then Result:='P'+IntToStr(Seconds div SecsPerDay)+'D'
+  else begin
+    Result:='PT';
+    DivMod(Seconds ,SecsPerHour,h,m); DivMod(m,SecsPerMin,m,s);
+    if h>0 then Result:=Result+IntToStr(h)+'H';
+    if m>0 then Result:=Result+IntToStr(m)+'M';
+    if s>0 then Result:=Result+IntToStr(s)+'S';
+    end;
+  end;
+
 function TWinTask.GetAuthor : string;
 begin
   Result:=pDefinition.RegistrationInfo.Author;
@@ -1592,6 +1642,36 @@ begin
 procedure TWinTask.SetWakeToRun (Value : boolean);
 begin
   pDefinition.Settings.WakeToRun:=Value;
+  end;
+
+function TWinTask.GetAllowDemandStart: boolean;
+begin
+  Result:=pDefinition.Settings.AllowDemandStart;
+  end;
+
+procedure TWinTask.SetAllowDemandStart (const Value: boolean);
+begin
+  pDefinition.Settings.AllowDemandStart:=Value;
+  end;
+
+function TWinTask.GetAllowHardTerminate: boolean;
+begin
+  Result:=pDefinition.Settings.AllowHardTerminate;
+  end;
+
+procedure TWinTask.SetAllowHardTerminate (const Value: boolean);
+begin
+  pDefinition.Settings.AllowHardTerminate:=Value;
+  end;
+
+function TWinTask.GetExecutionTimeLimit : cardinal;  // time in seconds
+begin
+  Result:=TimeStringToSeconds(pDefinition.Settings.ExecutionTimeLimit);
+  end;
+
+procedure TWinTask.SetExecutionTimeLimit (Value : cardinal);
+begin
+  pDefinition.Settings.ExecutionTimeLimit:=SecondsToTimeString(Value);
   end;
 
 function TWinTask.GetAction(Index: Integer) : TWinTaskAction;
