@@ -1812,7 +1812,7 @@ var
 begin
   try
     //  Get the registered tasks in the folder.
-    pTaskCollection:=pRootFolder.GetTasks(0);      // TASK_ENUM_HIDDEN
+    pTaskCollection:=pRootFolder.GetTasks(TASK_ENUM_HIDDEN);      // TASK_ENUM_HIDDEN
     FNumTasks:=pTaskCollection.Count;
     FTasks.Clear;
     for i:=1 to FNumTasks do begin
