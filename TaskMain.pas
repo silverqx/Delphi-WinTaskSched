@@ -225,25 +225,29 @@ begin
   User:=''; pwd:=''; ;
   if SelectedTaskIndex>=0 then with WinTasks do begin
     td:=NewTask; //Tasks[SelectedTaskIndex];
-    with td do begin
-      UserId:=UserName;
-      Description:='Test for new task';
-      LogOnType:=ltToken;   // as current user
-      Author:=UserId;
-      Date:=Now;
-      with TWinTaskExecAction(NewAction(taExec)) do begin
-        ApplicationPath:='c:\Windows\notepad.exe';
+    try
+      with td do begin
+        UserId:=UserName;
+        Description:='Test for new task';
+        LogOnType:=ltToken;   // as current user
+        Author:=UserId;
+        Date:=Now;
+        with TWinTaskExecAction(NewAction(taExec)) do begin
+          ApplicationPath:='c:\Windows\notepad.exe';
+          end;
+        with NewTrigger(ttWeekly) do begin
+          StartTime:=Now+1; EndTime:=Now+7; DaysOfWeek:=5;
+          Duration:=300; Interval:=60;
+          end;
         end;
-      with NewTrigger(ttWeekly) do begin
-        StartTime:=Now+1; EndTime:=Now+7; DaysOfWeek:=5;
-        Duration:=300; Interval:=60;
+      n:=TaskFolder.RegisterTask('Test-New',td,User,pwd);
+      if n<0 then MessageDlg(TaskFolder.ErrorMessage,mtError,[mbOK],0)
+      else begin
+        UpdateListeView(n);
+        ShowData(lvTasks.Items[n],true);
         end;
-      end;
-    n:=TaskFolder.RegisterTask('Test-New',td,User,pwd);
-    if n<0 then MessageDlg(TaskFolder.ErrorMessage,mtError,[mbOK],0)
-    else begin
-      UpdateListeView(n);
-      ShowData(lvTasks.Items[n],true);
+    finally
+      td.Free;
       end;
     end;
   end;
