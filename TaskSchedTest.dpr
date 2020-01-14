@@ -2,7 +2,10 @@ program TaskSchedTest;
 
 uses
   Vcl.Forms,
-  TaskMain in 'TaskMain.pas' {MainForm};
+  TaskMain in 'TaskMain.pas' {MainForm},
+  TaskSchedApi in 'units\TaskSchedApi.pas',
+  WinTask in 'units\WinTask.pas',
+  WinTaskConsts in 'units\WinTaskConsts.pas';
 
 {$R *.res}
 
