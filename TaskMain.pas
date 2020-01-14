@@ -68,7 +68,7 @@ implementation
 
 {$R *.dfm}
 
-uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX;
+uses System.Win.ComObj, System.DateUtils, System.UITypes, Vcl.FileCtrl, Winapi.ActiveX;
 
 function UserName : string;
 var
