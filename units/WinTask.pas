@@ -290,8 +290,10 @@ type
     procedure SetDisallowOnBatteries (Value : boolean);
     function GetStopOnBatteries : boolean;
     procedure SetStopOnBatteries (Value : boolean);
+{$WARN SYMBOL_PLATFORM OFF}
     function GetPriority : TThreadPriority;
     procedure SetPriority (Value : TThreadPriority);
+{$WARN SYMBOL_PLATFORM ON}
     function GetWakeToRun : boolean;
     procedure SetWakeToRun (Value : boolean);
     function GetAllowDemandStart : boolean;
@@ -330,7 +332,9 @@ type
     property Hidden : boolean read GetHidden write SetHidden;
     property Id : string read GetId write SetId;
     property LogonType : TLogonType read GetLogonType write SetLogonType;
+{$WARN SYMBOL_PLATFORM OFF}
     property Priority : TThreadPriority read GetPriority write SetPriority;
+{$WARN SYMBOL_PLATFORM ON}
     property RunIfMissed : boolean read GetRunIfMissed write SetRunIfMissed;
     property HighestRunLevel : boolean read GetRunLevel write SetRunLevel;
     property RunOnlyIfNetwork : boolean read GetRunOnlyIfNetwork write SetRunOnlyIfNetwork;
@@ -482,7 +486,9 @@ var
     (TASK_COMPATIBILITY_AT,TASK_COMPATIBILITY_V1,TASK_COMPATIBILITY_V2,
      TASK_COMPATIBILITY_V2_1,TASK_COMPATIBILITY_V2_2);
 
+{$WARN SYMBOL_PLATFORM OFF}
   Priorities : array[TThreadPriority] of integer = (10,9,7,5,3,1,0);
+{$WARN SYMBOL_PLATFORM ON}
 
 { --------------------------------------------------------------- }
 // Format without raising an exception on errors
@@ -1614,7 +1620,9 @@ begin
   pDefinition.Settings.StopIfGoingOnBatteries:=Value;
   end;
 
+{$WARN SYMBOL_PLATFORM OFF}
 function TWinTask.GetPriority : TThreadPriority;
+{$WARN SYMBOL_PLATFORM ON}
 begin
   case pDefinition.Settings.Priority of
   0 : Result:=tpTimeCritical;
@@ -1626,7 +1634,9 @@ begin
     end;
   end;
 
+{$WARN SYMBOL_PLATFORM OFF}
 procedure TWinTask.SetPriority (Value : TThreadPriority);
+{$WARN SYMBOL_PLATFORM ON}
 begin
   pDefinition.Settings.Priority:=Priorities[Value];
   end;
