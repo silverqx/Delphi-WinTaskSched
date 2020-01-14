@@ -198,7 +198,7 @@ type
     function GetTriggerTypeAsString : string;
     function GetTriggerString : String;
   public
-    constructor Create (Collection: TCollection);
+    constructor Create (Collection: TCollection); override;
     destructor Destroy; override;
     procedure SetTaskTrigger(const Value: ITrigger);
     procedure SetToDefault;
@@ -413,7 +413,6 @@ type
     property TaskCount : integer read FNumTasks;
     end;
 
-//  TWinTaskScheduler = class (TObject)
   TWinTaskScheduler = class (TObject)
   private
     pService :  ITaskService;
@@ -441,8 +440,8 @@ function CreateWinTaskScheduler (var TaskSchedule : TWinTaskScheduler) : HResult
 
 implementation
 
-uses System.Win.ComObj, System.DateUtils, System.Math, System.StrUtils, Winapi.ActiveX,
-  Winapi.WinSvc, System.Variants, WinTaskConsts;
+uses Winapi.ActiveX, Winapi.WinSvc, System.Win.ComObj, System.DateUtils, System.Character,
+  System.Math, System.StrUtils, System.Variants, System.TimeSpan, WinTaskConsts;
 
 const
   TaskTriggerNames : array[TWinTaskTriggerType] of string =
@@ -553,14 +552,12 @@ begin
 function ReadNextValue (var sTime : string) : word;
 var
   n,k,v : integer;
-const
-  Numbers = ['0'..'9'];
 begin
   if length(sTime)>0 then begin
     n:=1;
-    while not (sTime[n] in Numbers) do inc(n);
+    while not Char(sTime[n]).IsDigit do inc(n);
     k:=n;
-    while sTime[k] in Numbers do inc(k);
+    while Char(sTime[k]).IsDigit do inc(k);
     if TryStrToInt(copy(sTime,n,k-n),v) then Result:=v
     else Result:=0;
     Delete(sTime,1,k-1);
@@ -577,7 +574,7 @@ begin
 function BoundaryToTimeInfo (Boundary : string) : TTimeInfo; overload;
 var
   y,m,d,h,n,s : integer;
-  minus : boolean;
+//  minus : boolean;
 begin
   with Result do begin
     DateTime:=0; TimeZone:=false;
@@ -1010,8 +1007,6 @@ begin
   end;
 
 function TWinTaskTrigger.GetRandomDelay : cardinal;             // time in seconds
-var
-  st : string;
 begin
   case FTriggerType of
   ttTime   : Result:=TimeStringToSeconds(ITimeTrigger(pTrigger).RandomDelay);
@@ -1527,6 +1522,8 @@ begin
   TASK_LOGON_GROUP  : Result:=ltGroup;
   TASK_LOGON_SERVICE_ACCOUNT  : Result:=ltService;
   TASK_LOGON_INTERACTIVE_TOKEN_OR_PASSWORD  : Result:=ltTokenPassword;
+  else
+    Result:=ltNone
     end;
   end;
 
@@ -1888,7 +1885,7 @@ begin
 function TWinTaskFolder.Refresh : HResult;
 var
   i : integer;
-  pRegisteredTask : IRegisteredTask;
+//  pRegisteredTask : IRegisteredTask;
   ARegTask : TWinRegisteredTask;
 begin
   try
@@ -1933,10 +1930,10 @@ function TWinTaskFolder.RegisterTask (const TaskName : string; ATask : TWinTask;
                                       Username,Password : string) : integer;
 var
   pRegisteredTask : IRegisteredTask;
-  ARegTask : TWinRegisteredTask;
-  n : integer;
+//  ARegTask : TWinRegisteredTask;
+//  n : integer;
 begin
-  Result:=-1; FErrMsg:=''; FErrorCode:=NO_ERROR;
+  FErrMsg:=''; FErrorCode:=NO_ERROR;
   if ATask.LogonType=ltToken then begin
     Username:=''; Password:='';
     end
@@ -1995,8 +1992,6 @@ begin
 
 { $O-}     // does not work with optimization ??
 function TWinTaskScheduler.Init : HResult;
-var
-  ok : boolean;
 begin
   if succeeded(FResult) then begin
     //  Connect to the local task service.
