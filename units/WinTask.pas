@@ -1769,6 +1769,7 @@ begin
 
 destructor TWinRegisteredTask.Destroy;
 begin
+  FreeAndNil(FTask);
   pRegisteredTask:=nil;
   inherited Destroy;
   end;
