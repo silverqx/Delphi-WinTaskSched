@@ -345,7 +345,7 @@ type
     property UserId : string read GetUserId write SetUserId;
     property WakeToRun : boolean read GetWakeToRun  write SetWakeToRun;
     property AllowDemandStart : boolean read GetAllowDemandStart write SetAllowDemandStart;
-    property AllowAllowHardTerminate : boolean read GetAllowHardTerminate write SetAllowHardTerminate;
+    property AllowHardTerminate : boolean read GetAllowHardTerminate write SetAllowHardTerminate;
     property ExecutionTimeLimit : cardinal read GetExecutionTimeLimit write SetExecutionTimeLimit;
     end;
 
